@@ -9,7 +9,7 @@ class MyConstant {
   static String appName = 'Aum Thai';
   static String domain = 'https://www.aumthai.com/api/';
 
-  // static LatLng officeLatLng = LatLng(13.750928127933552, 99.92270664340157);
+  // static LatLng officeLatLng = LatLng(13.750700973470796, 99.9231847970271);
 
   static LatLng officeLatLng = LatLng(13.751051933315972, 99.9329209941494);
 

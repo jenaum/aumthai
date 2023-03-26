@@ -1,11 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:aum_thai_v1/models/qr_model.dart';
 import 'package:aum_thai_v1/utility/app_controller.dart';
 import 'package:aum_thai_v1/utility/app_diakog.dart';
 import 'package:aum_thai_v1/utility/my_constant.dart';
 import 'package:aum_thai_v1/widgets/widget_text.dart';
 import 'package:aum_thai_v1/widgets/widget_text_button.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -13,6 +16,29 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class AppService {
   AppController appController = Get.put(AppController());
+
+  Future<bool> checkQRcode({required String qrCode}) async {
+    String urlApi = 'https://www.aumthai.com/api/getAllQr.php';
+    var qrModels = <QrModel>[];
+    var reult = await Dio().get(urlApi);
+    for (var element in json.decode(reult.data)) {
+      QrModel model = QrModel.fromMap(element);
+      qrModels.add(model);
+    }
+
+    return qrCode == qrModels.last.qrcode;
+  }
+
+  Future<void> readQrModel() async {
+    String urlApi = 'https://www.aumthai.com/api/getAllQr.php';
+
+    await Dio().get(urlApi).then((value) {
+      for (var element in json.decode(value.data)) {
+        QrModel model = QrModel.fromMap(element);
+        appController.qrModels.add(model);
+      }
+    });
+  }
 
   double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
     double distance = 0;

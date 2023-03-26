@@ -12,6 +12,7 @@ import 'package:aum_thai_v1/widgets/widget_text.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Authen extends StatefulWidget {
   const Authen({super.key});
@@ -73,7 +74,9 @@ class _AuthenState extends State<Authen> {
                         String urlApiGetUserWhereUser =
                             "https://www.aumthai.com/api/getUaerwhereUser.php?isAdd=true&user=$user";
 
-                        await Dio().get(urlApiGetUserWhereUser).then((value) {
+                        await Dio()
+                            .get(urlApiGetUserWhereUser)
+                            .then((value) async {
                           if (value.toString() == 'null') {
                             AppSnackBar(
                                     title: "User False",
@@ -85,7 +88,22 @@ class _AuthenState extends State<Authen> {
 
                               if (password == userModel.password) {
                                 // Su
-                                Get.offAll(const MainHome());
+
+                                SharedPreferences preferences =
+                                    await SharedPreferences.getInstance();
+                                var datas = <String>[];
+                                datas.add(userModel.id);
+                                datas.add(userModel.iduser);
+                                datas.add(userModel.prefix);
+                                datas.add(userModel.firstname);
+                                datas.add(userModel.lastname);
+                                datas.add(userModel.type);
+
+                                preferences
+                                    .setStringList("datas", datas)
+                                    .then((value) {
+                                  Get.offAll(const MainHome());
+                                });
                               } else {
                                 AppSnackBar(
                                         title: "รหัสไม่ถูกต้อง",

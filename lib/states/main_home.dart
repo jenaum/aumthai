@@ -8,6 +8,9 @@ import 'package:aum_thai_v1/widgets/widget_icon_button.dart';
 import 'package:aum_thai_v1/widgets/widget_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:qrscan/qrscan.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainHome extends StatefulWidget {
   const MainHome({super.key});
@@ -61,7 +64,7 @@ class _MainHomeState extends State<MainHome> {
                 ? [
                     WidgetIconButton(
                       iconData: Icons.qr_code,
-                      pressFunc: () {
+                      pressFunc: () async {
                         double distance = AppService().calculateDistance(
                             appController.positions.last.latitude,
                             appController.positions.last.longitude,
@@ -72,6 +75,40 @@ class _MainHomeState extends State<MainHome> {
                         if (distance <= MyConstant.radiusOffice) {
                           // Can CheckIn
 
+                          await Permission.camera.status.then((value) async {
+                            if (value.isDenied) {
+                              await Permission.camera
+                                  .request()
+                                  .then((value) => null);
+                            } else {
+                              //  Read QR code
+
+                              try {
+                                var qrCode = await scan();
+                                if (qrCode != null) {
+                                  print("## qrCode --> $qrCode");
+
+                                  await AppService()
+                                      .checkQRcode(qrCode: qrCode)
+                                      .then((value) {
+                                    if (value) {
+                                      /// Check True
+                                      print("## Check Ture");
+                                    } else {
+                                      // Check False
+                                      AppSnackBar(
+                                              title: "Check False",
+                                              message:
+                                                  'วันนี้ ไม่ได้ใช้ Code นี้')
+                                          .errorSnackBar();
+                                    }
+                                  });
+                                }
+                              } catch (e) {
+                                print("error ---> $e");
+                              }
+                            }
+                          });
                         } else {
                           AppSnackBar(
                                   title: "ไม่สามารถ CheckIn",
@@ -86,7 +123,17 @@ class _MainHomeState extends State<MainHome> {
                       pressFunc: () {
                         AppService().findPosition(context: context);
                       },
-                    )
+                    ),
+                    WidgetIconButton(
+                      iconData: Icons.exit_to_app,
+                      pressFunc: () async {
+                        SharedPreferences prefeerences =
+                            await SharedPreferences.getInstance();
+                        prefeerences.clear().then((value) {
+                          Get.offAllNamed('/mobile');
+                        });
+                      },
+                    ),
                   ]
                 : [],
           ),

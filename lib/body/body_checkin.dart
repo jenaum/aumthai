@@ -23,42 +23,44 @@ class _BodyCheckInState extends State<BodyCheckIn> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, BoxConstraints boxConstraints) {
-      return GetX(
-        init: AppController(),
-        builder: (AppController appController) {
-          print("Positions===> ${appController.positions.length}");
-          return appController.positions.isEmpty
-              ? const SizedBox()
-              : SizedBox(
-                  width: boxConstraints.maxWidth,
-                  height: boxConstraints.maxHeight,
-                  child: GoogleMap(
-                    initialCameraPosition: CameraPosition(
-                      target: LatLng(
-                        appController.positions.last.latitude,
-                        appController.positions.last.longitude,
-                      ),
-                      zoom: 16,
-                    ),
-                    onMapCreated: (controller) {},
-                    markers: AppService().createMarkerSet(),
-                    circles: <Circle>{
-                      Circle(
-                        circleId: CircleId("user"),
-                        center: LatLng(
+    return LayoutBuilder(
+      builder: (context, BoxConstraints boxConstraints) {
+        return GetX(
+          init: AppController(),
+          builder: (AppController appController) {
+            print("Positions===> ${appController.positions.length}");
+            return appController.positions.isEmpty
+                ? const SizedBox()
+                : SizedBox(
+                    width: boxConstraints.maxWidth,
+                    height: boxConstraints.maxHeight,
+                    child: GoogleMap(
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(
                           appController.positions.last.latitude,
                           appController.positions.last.longitude,
                         ),
-                        radius: MyConstant.radiusOffice,
-                        strokeWidth: 1,
-                        fillColor: colorBlueLight.withOpacity(0.25),
+                        zoom: 16,
                       ),
-                    },
-                  ),
-                );
-        },
-      );
-    });
+                      onMapCreated: (controller) {},
+                      markers: AppService().createMarkerSet(),
+                      circles: <Circle>{
+                        Circle(
+                          circleId: CircleId("user"),
+                          center: LatLng(
+                            appController.positions.last.latitude,
+                            appController.positions.last.longitude,
+                          ),
+                          radius: MyConstant.radiusOffice,
+                          strokeWidth: 1,
+                          fillColor: colorBlueLight.withOpacity(0.25),
+                        ),
+                      },
+                    ),
+                  );
+          },
+        );
+      },
+    );
   }
 }

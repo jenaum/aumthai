@@ -43,6 +43,9 @@ dependencies:
   dio: ^5.0.3
   geolocator: ^9.0.2
   google_maps_flutter: ^2.2.5
+  qrscan: ^0.3.3
+  permission_handler: ^10.2.0
+  shared_preferences: ^2.0.20
 
 
 flutter_icons:
