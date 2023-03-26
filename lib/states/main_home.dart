@@ -1,6 +1,10 @@
 import 'package:aum_thai_v1/body/body_checkin.dart';
 import 'package:aum_thai_v1/body/body_history.dart';
 import 'package:aum_thai_v1/utility/app_controller.dart';
+import 'package:aum_thai_v1/utility/app_service.dart';
+import 'package:aum_thai_v1/utility/app_snacckbar.dart';
+import 'package:aum_thai_v1/utility/my_constant.dart';
+import 'package:aum_thai_v1/widgets/widget_icon_button.dart';
 import 'package:aum_thai_v1/widgets/widget_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -47,24 +51,55 @@ class _MainHomeState extends State<MainHome> {
   @override
   Widget build(BuildContext context) {
     return GetX(
-        init: AppController(),
-        builder: (AppController appController) {
-          // print('ini => ${appController.indexBody}');
-          return Scaffold(
-            appBar: AppBar(
-              title: WidgetText(
-                data: titles[appController.indexBody.value],
-              ),
-            ),
-            body: bodys[appController.indexBody.value],
-            bottomNavigationBar: BottomNavigationBar(
-              items: bottonBarItens,
-              currentIndex: appController.indexBody.value,
-              onTap: (value) {
-                appController.indexBody.value = value;
-              },
-            ),
-          );
-        });
+      init: AppController(),
+      builder: (AppController appController) {
+        // print('ini => ${appController.indexBody}');
+        return Scaffold(
+          appBar: AppBar(
+            title: WidgetText(data: titles[appController.indexBody.value]),
+            actions: appController.indexBody.value == 0
+                ? [
+                    WidgetIconButton(
+                      iconData: Icons.qr_code,
+                      pressFunc: () {
+                        double distance = AppService().calculateDistance(
+                            appController.positions.last.latitude,
+                            appController.positions.last.longitude,
+                            MyConstant.officeLatLng.latitude,
+                            MyConstant.officeLatLng.longitude);
+                        print("distance --> $distance");
+
+                        if (distance <= MyConstant.radiusOffice) {
+                          // Can CheckIn
+
+                        } else {
+                          AppSnackBar(
+                                  title: "ไม่สามารถ CheckIn",
+                                  message:
+                                      "ระยะห่าง คุณคือ $distance เมตร คุณไม่ได้อยู่ใน Office")
+                              .errorSnackBar();
+                        }
+                      },
+                    ),
+                    WidgetIconButton(
+                      iconData: Icons.refresh,
+                      pressFunc: () {
+                        AppService().findPosition(context: context);
+                      },
+                    )
+                  ]
+                : [],
+          ),
+          body: bodys[appController.indexBody.value],
+          bottomNavigationBar: BottomNavigationBar(
+            items: bottonBarItens,
+            currentIndex: appController.indexBody.value,
+            onTap: (value) {
+              appController.indexBody.value = value;
+            },
+          ),
+        );
+      },
+    );
   }
 }
