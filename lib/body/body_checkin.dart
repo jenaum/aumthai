@@ -1,3 +1,4 @@
+import 'package:aum_thai_v1/widgets/widget_text.dart';
 import 'package:flutter/material.dart';
 
 class BodyCheckIn extends StatelessWidget {
@@ -5,6 +6,6 @@ class BodyCheckIn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return WidgetText(data: "CheckIbn");
   }
 }
